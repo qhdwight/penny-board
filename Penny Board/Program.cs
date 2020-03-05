@@ -10,19 +10,21 @@ namespace Penny_Board
     {
         private const int TimeoutMs = 150, UpdatePeriodMs = 20;
         private static readonly VictorSPX Victor = new VictorSPX(0);
-        // private static readonly PWM Controller = new PWM(Cpu.PWMChannel.PWM_0, 0, 0, PWM.ScaleFactor.Microseconds, false);
         private static readonly PWM Radio = new PWM(Cpu.PWMChannel.PWM_0, 10000, 1500, PWM.ScaleFactor.Microseconds, false);
 
         public static void Main()
         {
             var configuration = new VictorSPXConfiguration();
             Victor.ConfigAllSettings(configuration, TimeoutMs);
+            Victor.ConfigVoltageCompSaturation(12.0f);
+            Victor.EnableVoltageCompensation(true);
             Victor.SetControlFramePeriod(ControlFrame.Control_3_General, UpdatePeriodMs);
-            Radio.Start();
+            // Radio.Start();
             while (true)
             {
                 Thread.Sleep(UpdatePeriodMs);
                 Watchdog.Feed();
+                Victor.Set(ControlMode.PercentOutput, 0.05);
             }
         }
     }
